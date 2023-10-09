@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Logged</title>
+
+    <!-- Styles from Virginia Valet Company -->
+    <script src="https://use.typekit.net/cch3fzg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link rel="stylesheet" type="text/css" href="/updates/concrete5.6.3.4/concrete/css/ccm.base.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/docs.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/bootstrap-overwrites.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/members.css" />
+    <link rel="stylesheet" media="screen" type="text/css" href="/files/cache/css/bootstrap/typography.css" />
+
+    <style>
+        body {
+            background: url('/files/6714/4105/0536/car-bg.jpg') repeat-y fixed !important;
+            background-size: 100% auto !important;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #32325d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .shift-log-container {
+            background-color: rgba(247, 247, 247, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h2 {
+            color: #32325d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        p, ul {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: inline-block;
+            color: white;
+            background-color: #32325d;
+            padding: 15px 25px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+
+        a:hover {
+            background-color: #55578e;
+            text-decoration: none;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="shift-log-container">
+        <h2>Shift Successfully Logged</h2>
+        <p>You've logged the following shift:</p>
+        <ul>
+            <li><strong>Date:</strong> {{ shift.date }}</li>
+            <li><strong>Start Time:</strong> {{ shift.start_time }}</li>
+            <li><strong>End Time:</strong> {{ shift.end_time }}</li>
+            <li><strong>Hours:</strong> {{ shift.hours_worked }}</li>
+            <li><strong>Tips:</strong> {{ shift.tips_earned }}</li>
+            <li><strong>Location:</strong> {{ shift.location }}</li>
+            <!-- Add more fields as needed -->
+        </ul>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('log_work_form') }}">Log Another Shift</a>
+            <a href="{{ url_for('index') }}">Go Home</a>
+        </div>
+    </div>
+</body>
+</html>
+

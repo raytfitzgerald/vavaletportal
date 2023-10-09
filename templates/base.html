@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal</title>
+
+    <!-- External Scripts -->
+    <script src="https://use.typekit.net/cch3fzg.js"></script>
+    <script>
+        try {
+            Typekit.load({ async: true });
+        } catch (e) {}
+    </script>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="/updates/concrete5.6.3.4/concrete/css/ccm.base.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/docs.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/bootstrap-overwrites.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/members.css" />
+    <link rel="stylesheet" media="screen" type="text/css" href="/files/cache/css/bootstrap/typography.css" />
+
+    <!-- Internal Styles -->
+    <style>
+        /* General Styling */
+        body {
+            background: url('/files/6714/4105/0536/car-bg.jpg') repeat-y fixed !important;
+            background-size: cover !important;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #32325d;
+            padding: 2em;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            color: #32325d;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 2em auto;
+            padding: 20px;
+            background-color: rgba(247, 247, 247, 0.9);  /* Slight transparency */
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+        }
+
+        /* Button Styles */
+        button, input[type="submit"] {
+            background-color: #32325d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            background-color: #55578e;
+            transform: scale(1.05);  /* Slightly enlarge on hover */
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin: 20px 0;
+            padding: 1em 0;
+            background-color: rgba(50, 50, 93, 0.9);  /* Dark background with slight transparency */
+            border-radius: 10px;
+        }
+
+        .logo-link {
+            display: inline-block;
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            background: none;
+            text-decoration: none;
+        }
+
+        .logo-link img {
+            display: block;
+            max-width: 100%;  /* Ensures the logo doesn't overflow its container */
+            border-radius: 10px;  /* Rounded corners for logo */
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2em 0;
+            background-color: rgba(50, 50, 93, 0.9);
+            border-top: 1px solid #e0e0e0;
+            margin-top: 2em;
+            color: white;
+        }
+        
+        
+    </style>
+</head>
+
+<body>
+
+    <!-- Header with link to the homepage -->
+    <header>
+        <a href="{{ url_for('index') }}" class="logo-link">
+            <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Employee Portal Logo">
+        </a>
+    </header>
+
+    <!-- Main content will be filled here by templates that extend base.html -->
+ <div class="main-content-container">
+    {% block content %}{% endblock %}
+</div>
+
+    <!-- Optionally, you can also have a common footer here -->
+    <div class="footer">
+        © 2023 Employee Portal. All Rights Reserved.
+    </div>
+
+</body>
+</html>

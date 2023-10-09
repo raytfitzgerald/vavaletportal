@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Admin View</title>
+    <style>
+        .table-container {
+            text-align: center;
+            margin: 0 auto;
+            width: fit-content; /* Makes the container wrap its content */
+        }
+        table {
+            margin: 0 auto; /* Centers the table */
+        }
+    </style>
+</head>
+<body>
+    <!-- Availability Table -->
+    <div class="table-container">
+        <h2>Availability</h2>
+        <table border="1">
+            <tr>
+                <th>Employee</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+            </tr>
+            {% for employee, data in availability_data.items() %}
+                <tr>
+                    <td>{{ employee }}</td>
+                    {% if data is string %}
+                        <td colspan="7">{{ data }}</td>
+                    {% else %}
+                        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                            <td>{{ data.get(day, (None, None))[0] }} - {{ data.get(day, (None, None))[1] }}</td>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+{% endblock %}

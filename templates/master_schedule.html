@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="text-align: center;">Master Schedule</h1>
+
+<!-- Displaying the week for the schedule -->
+{% if last_updated %}
+    <p>Last Updated: {{ last_updated }}</p>
+{% endif %}
+
+
+<div class="tab">
+    <button class="tablinks" onclick="openScheduleType(event, 'LocationBased')">By Location</button>
+    <button class="tablinks" onclick="openScheduleType(event, 'EmployeeBased')">By Employee</button>
+</div>
+
+<!-- Location-based Schedule -->
+<div id="LocationBased" class="tabcontent">
+    <h2>Location Schedule</h2>
+    <!-- <a href="{{ url_for('export_location_schedule_csv') }}" class="btn btn-primary">Export Location Schedule as CSV</a> -->
+
+    <table>
+        <thead>
+            <tr>
+                <th>Location / Day</th>
+                {% for day in days %}
+                    <th>{{ day.capitalize() }}</th> <!-- Display capitalized day names in the header -->
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for location, days_data in location_schedule.items() %}
+                <tr>
+                    <td>{{ location }}</td>
+                    {% for day in days %}
+                        <td>
+                            {% for shift in days_data[day.lower()] %} <!-- Access the data using lowercase days -->
+                                {{ shift.employee }} ({{ shift.time }})<br>
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Employee-based Schedule -->
+<div id="EmployeeBased" class="tabcontent">
+    <h2>Employee Schedule</h2>
+    <!--<a href="{{ url_for('export_employee_schedule_csv') }}" class="btn btn-primary">Export Employee Schedule as CSV</a> -->
+
+    <table>
+        <thead>
+            <tr>
+                <th>Employee / Day</th>
+                {% for day in days %}
+                    <th>{{ day.capitalize() }}</th> <!-- Display capitalized day names in the header -->
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee, days_data in employee_schedule.items() %}
+                <tr>
+                    <td>{{ employee }}</td>
+                    {% for day in days %}
+                        <td>
+                            {% for shift in days_data[day.lower()] %} <!-- Access the data using lowercase days -->
+                                {{ shift.location }} ({{ shift.time }})<br>
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+function openScheduleType(evt, scheduleType) {
+    var i, tabcontent, tablinks;
+
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    document.getElementById(scheduleType).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
+
+<style>
+/* Styling for tabs */
+.tab {
+    overflow: hidden;
+    background-color: rgba(50, 50, 93, 0.9); /* Taken from your base.html */
+    padding: 6px 12px;
+}
+
+.tab button {
+    background-color: inherit;
+    float: center;
+    border: 1px solid rgba(30, 30, 70, 0.9); /* Darker border from your base.html */
+    border-radius: 4px;
+    margin-right: 6px;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    color: #ddd; /* Text color for inactive tabs */
+}
+
+.tab button:hover {
+    background-color: rgba(30, 30, 70, 0.9); /* Darker hover from your base.html */
+    color: #fff; /* Text color on hover */
+}
+
+.tab button.active {
+    background-color: rgba(10, 10, 50, 0.9); /* Even darker active tab from your base.html */
+    color: #fff; /* Text color for active tab */
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border-top: none;
+    background-color: #f7f7f7; /* Neutral background for content */
+}
+
+
+/* Styling for tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 8px 12px;
+    text-align: center;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+</style>
+
+{% endblock %}

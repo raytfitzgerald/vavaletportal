@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valet Schedule</title>
+
+    <!-- Styles from Virginia Valet Company -->
+    <script src="https://use.typekit.net/cch3fzg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link rel="stylesheet" type="text/css" href="/updates/concrete5.6.3.4/concrete/css/ccm.base.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/docs.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/bootstrap/bootstrap-overwrites.css" />
+    <link rel="stylesheet" type="text/css" href="/packages/bootstrap/css/members.css" />
+    <link rel="stylesheet" media="screen" type="text/css" href="/files/cache/css/bootstrap/typography.css" />
+
+    <style>
+        body {
+            background: url('/files/6714/4105/0536/car-bg.jpg') repeat-y fixed !important;
+            background-size: 100% auto !important;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #32325d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(247, 247, 247, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h2 {
+            color: #32325d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: white;
+            background-color: #32325d;
+            padding: 15px 25px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #55578e;
+            text-decoration: none;
+        }
+        
+        header {
+            text-align: center;
+            margin: 20px 0;  /* Adjust this for vertical spacing */
+        }
+        
+        .logo-link {
+            display: inline-block;
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            background: none;
+            text-decoration: none;
+        }
+
+        .logo-link img {
+            display: block;
+        }
+    </style>
+
+</head>
+
+<body>
+
+        <div class="main-content">
+        <header>
+            <a href="{{ url_for('index') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Employee Portal Logo" style="width: 200px;">
+            </a>
+        </header>
+
+        <div class="container">
+            <h2>Welcome to the VaValet Admin Portal</h2>
+            <p><a href="{{ url_for('employee_submissions') }}">Employee Submissions</a></p>
+            <p><a href="{{ url_for('availability_sheet') }}">Availability Sheet</a></p>
+            <p><a href="{{ url_for('calendar_view') }}">Calendar</a></p>
+            <p><a href="{{ url_for('shifts') }}">Shifts</a></p>
+            
+            
+
+        </div>
+
+    </div>
+    
+</body>
+
+</html>

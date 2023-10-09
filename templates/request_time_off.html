@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Request Time Off</h2>
+    <form action="{{ url_for('request_time_off') }}" method="post">
+    <div class="form-group">
+        <label for="Name">Name:</label>
+        <input type="Text" class="form-control" id="Name" name="Name" required>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" class="form-control" id="dob" name="dob" required>
+        <br>
+    </div>
+        <div class="form-group">
+            <label for="startDate">Start Date:</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date:</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" required>
+        </div>
+        <div class="form-group">
+            <label for="reason">Reason:</label>
+            <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

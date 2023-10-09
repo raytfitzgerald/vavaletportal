@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="text-align: center;">Shifts</h1>
+<div class="text-center my-4 action-buttons">
+    <form action="{{ url_for('update_schedule') }}" method="post" class="update-btn" onsubmit="return confirm('Are you sure you want to update the schedule?');">
+        <button type="submit" class="btn btn-success">Update Schedule</button>
+    </form>
+
+    <form action="/clear_schedule" method="post" class="clear-btn" onsubmit="return confirm('Are you sure you want to clear the schedule?');">
+        <input type="submit" value="Clear Schedule">
+    </form>
+</div>
+
+
+
+
+<div class="tab">
+    <button class="tablinks" onclick="openDay(event, 'Monday')">Monday</button>
+    <button class="tablinks" onclick="openDay(event, 'Tuesday')">Tuesday</button>
+    <button class="tablinks" onclick="openDay(event, 'Wednesday')">Wednesday</button>
+    <button class="tablinks" onclick="openDay(event, 'Thursday')">Thursday</button>
+    <button class="tablinks" onclick="openDay(event, 'Friday')">Friday</button>
+    <button class="tablinks" onclick="openDay(event, 'Saturday')">Saturday</button>
+    <button class="tablinks" onclick="openDay(event, 'Sunday')">Sunday</button>
+</div>
+
+<!-- Loop through each day and its shifts -->
+{% for day, locations in shifts.items() %}
+    <div id="{{ day }}" class="tabcontent">
+        <h2>{{ day }}</h2>
+
+        <!-- Loop through locations and shifts for the day -->
+        {% for location, shifts in locations.items() %}
+            <div class="location" id="location-{{ location }}-{{ day.lower() }}">
+                <h3>{{ location }}</h3>
+                
+                <!-- Display shifts for the location -->
+                {% for shift in shifts %}
+                    <div class="shift-time" data-id="{{ shift.id }}">
+                        <strong>{{ shift.start_time }} - {{ shift.end_time }}</strong>
+                        <!-- Dropdown to select employee for the shift -->
+                        <select class="employee-dropdown" id="employee_name-{{ location }}-{{ day.lower() }}-{{ shift.id }}">
+                            {% for employee_name in shift.available_employee_names %}
+                                <option value="{{ employee_name }}">{{ employee_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button onclick="assignEmployee('{{ shift.id }}', '{{ location }}', '{{ day.lower() }}')">Assign Employee</button>
+                        <button onclick="deleteShiftTime('{{ shift.id }}', '{{ location }}', '{{ day.lower() }}')">Delete Shift Time</button>
+                        
+                        <!-- Loop to display employees assigned for this shift -->
+                        {% for employee in shift.employees %}
+                            <div class="employee">
+                                {{ employee.name }} 
+                                <button onclick="unassignEmployee(this, '{{ shift.id }}', '{{ employee.name }}')">Unassign</button>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+
+                <!-- Add shift form -->
+                <div class="add-shift-form">
+                    Start Time: <input type="time" id="start_time-{{ location }}-{{ day.lower() }}">
+                    End Time: <input type="time" id="end_time-{{ location }}-{{ day.lower() }}">
+                    <button onclick="addShift('{{ location }}', '{{ day.lower() }}')">Add Shift Time</button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<button onclick="addLocation()">Add Location</button>
+
+<script>
+
+function deleteShiftTime(shiftId, locationName, day) {
+    var confirmation = confirm("Are you sure you want to delete this shift time? All assigned employees for this shift will also be removed.");
+
+    if (confirmation) {
+        var formData = new URLSearchParams();
+        formData.append('shift_id', shiftId);
+
+        fetch('/delete_shift_time', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Dynamically remove the shift time from the page
+                const shiftTimeElement = document.querySelector(`.shift-time[data-id="${shiftId}"]`);
+                shiftTimeElement.remove();
+                // Notify admin
+                alert("Shift time deleted successfully!");
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+
+function addShift(locationName, day) {
+    var startTime = document.getElementById(`start_time-${locationName}-${day}`).value;
+    var endTime = document.getElementById(`end_time-${locationName}-${day}`).value;
+
+    var formData = new URLSearchParams();
+    formData.append('day', day);
+    formData.append('location', locationName);
+    formData.append('start_time', startTime);
+    formData.append('end_time', endTime);
+
+    fetch('/save_shift_time', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Dynamically add the shift time to the page
+             const shiftTimeElement = document.createElement('div');
+            shiftTimeElement.classList.add('shift-time');
+            shiftTimeElement.dataset.id = data.shift_id;  // Ensure you set the data-id attribute
+            shiftTimeElement.innerHTML = `<strong>${startTime} - ${endTime}</strong> 
+                <select class="employee-dropdown" id="employee_name-${locationName}-${day}-${data.shift_id}">
+                    <!-- This will be populated later -->
+                </select>
+                <button onclick="assignEmployee('${data.shift_id}', '${locationName}', '${day}')">Assign Employee</button>`;
+            const locationElement = document.getElementById(`location-${locationName}-${day}`);
+            locationElement.appendChild(shiftTimeElement);
+
+            // Notify admin
+            alert("Shift time added successfully!");
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+    function addLocation() {
+        const locationName = prompt("Enter the name of the new location:");
+
+        if (locationName) {
+            // Send an AJAX request to save the new location
+            var formData = new URLSearchParams();
+            formData.append('location', locationName);
+            fetch('/save_location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    
+                    // Dynamically add the new location to the page for each day
+                    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                    days.forEach(day => {
+                        const dayElement = document.getElementById(day.toLowerCase());
+                        if(dayElement) {  // Check if the day element exists
+                            const locationElement = document.createElement('div');
+                            locationElement.classList.add('location');
+                            locationElement.innerHTML = `<h3>${locationName} <button onclick="showAddShiftForm('${locationName}', '${day.toLowerCase()}')">Add Shift</button></h3>`;
+                            dayElement.appendChild(locationElement);
+                        }
+                    });
+                    
+                } else {
+                    alert("Error adding location.");
+                }
+            });
+        }
+    }
+
+    function showAddShiftForm(locationName, day) {
+        var shiftTime = prompt("Enter the shift time:");
+        if (shiftTime) {
+            var employeeName = prompt("Enter the employee name for the shift:");
+            if (employeeName) {
+                // Send an AJAX request to save the shift
+                var formData = new URLSearchParams();
+                var capitalizedDay = day.charAt(0).toUpperCase() + day.slice(1);
+                formData.append('day', capitalizedDay);
+                formData.append('location', locationName);
+                formData.append('employee_name', employeeName);
+                formData.append('shift_time', shiftTime);
+                fetch('/save_shift', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Dynamically add the shift to the page
+                        const shiftElement = document.createElement('div');
+                        shiftElement.classList.add('shift');
+                        shiftElement.innerHTML = `${employeeName} - ${shiftTime}`;
+                        const locationElement = document.getElementById(`location-${locationName}-${day}`);
+                        locationElement.appendChild(shiftElement);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    }
+
+function deleteShift(shiftElement, locationName, day, employeeName, shiftTime) {
+    // Send an AJAX request to delete the shift
+    var formData = new URLSearchParams();
+    formData.append('day', day);
+    formData.append('location', locationName);
+    formData.append('employee_name', employeeName);
+    formData.append('shift_time', shiftTime);
+
+    fetch('/delete_shift', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Dynamically remove the shift from the page
+            shiftElement.parentElement.removeChild(shiftElement);
+
+            // Notify admin
+            alert("Shift successfully deleted!");
+        } else {
+            alert("Error deleting shift.");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function openDay(evt, dayName) {
+    var i, tabcontent, tablinks;
+
+    // Hide all tab contents
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Deactivate all tab links
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Display the selected day's content and activate the tab link
+    document.getElementById(dayName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+    
+function assignEmployee(shiftId, locationName, day) {
+    var employeeName = document.getElementById(`employee_name-${locationName}-${day}-${shiftId}`).value;
+
+    var formData = new URLSearchParams();
+    formData.append('shift_id', shiftId);
+    formData.append('employee_name', employeeName);
+
+    fetch('/assign_employee', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Dynamically add the employee name under the shift time
+            const employeeElement = document.createElement('div');
+            employeeElement.classList.add('employee');
+            employeeElement.innerHTML = `${employeeName} <button onclick="unassignEmployee(this, '${shiftId}', '${employeeName}')">Unassign</button>`;
+            const shiftTimeElement = document.querySelector(`.shift-time[data-id="${shiftId}"]`);
+            shiftTimeElement.appendChild(employeeElement);
+            // Notify admin
+            alert(`${employeeName} assigned successfully!`);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function unassignEmployee(element, shiftId, employeeName) {
+    var formData = new URLSearchParams();
+    formData.append('shift_id', shiftId);
+    formData.append('employee_name', employeeName);
+
+    fetch('/unassign_employee', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Dynamically remove the employee name from the page
+            element.parentElement.remove();
+            // Notify admin
+            alert(`${employeeName} unassigned successfully!`);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+
+window.onload = fetchEmployeesAndPopulateDropdowns;
+
+// Initialization: Hide all tabs on load
+window.onload = function() {
+    var tabcontent = document.getElementsByClassName("tabcontent");
+    for (var i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetchEmployeesAndPopulateDropdowns();
+});
+
+
+
+</script>
+
+<style>
+    /* ... [Your existing CSS styles] ... */
+
+    /* Tab styling for days of the week */
+    .tab button {
+        background-color: rgba(50, 50, 93, 0.9);
+        float: none; /* Center the tabs */
+        display: inline-block;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        color: white; /* Text color */
+    }
+
+    .tab button:hover {
+        background-color: rgba(30, 30, 70, 0.9); /* Slightly darker on hover */
+    }
+
+    .tab button.active {
+        background-color: rgba(10, 10, 50, 0.9); /* Even darker when active */
+    }
+
+    /* Center the tabs */
+    .tab {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Additional styles for shift creation and assignment */
+    .add-shift-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+ -for-location {
+        margin-top: 20px;
+    }
+    
+    .tabcontent {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    .location {
+        background-color: #f8f8f8;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    .shift-time {
+        border: 1px solid #e1e1e1;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        background-color: #ffffff;
+    }
+
+    .employee-dropdown {
+        margin-right: 10px;
+    }
+
+    .employee {
+        margin-top: 5px;
+        background-color: #eef;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: space-between; /* This will push the buttons to the far ends of the container */
+        max-width: 500px; /* Adjust this value as per your design requirement */
+        margin: 0 auto;  /* This will center the flex container */
+    }
+
+.update-btn, .clear-btn {
+        flex-basis: 48%; /* This will ensure each button form takes almost half the container width minus a bit for spacing */
+    }
+
+    
+</style>
+
+
+{% endblock %}

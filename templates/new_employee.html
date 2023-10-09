@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Employee</title>
+</head>
+<body>
+    <form action="/add_employee" method="post">
+        <label for="name">Employee Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required><br><br>
+
+        <label for="passcode">New Employee Passcode:</label>
+        <input type="password" id="passcode" name="passcode" required><br><br>
+
+        <input type="submit" value="Add Employee">
+    </form>
+</body>
+{% endblock %}
