@@ -11,12 +11,12 @@ Created on Wed Aug 16 07:25:42 2023
 import sqlite3
 from flask import Flask, render_template, jsonify, request, redirect, url_for, Response
 from datetime import datetime, timedelta
-from flask_admin import Admin
+#from flask_admin import Admin
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vavalet.db'
-admin = Admin(app)
+#admin = Admin(app)
 
 today = datetime.today()
 start_of_week = today - timedelta(days=today.weekday())  # This gives Monday of the current week
